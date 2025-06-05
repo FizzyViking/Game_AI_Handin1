@@ -53,8 +53,9 @@ class GameController(object):
         self.nodes = NodeGroup(self.mazedata.obj.name+".txt")
         self.mazedata.obj.setPortalPairs(self.nodes)
         self.mazedata.obj.connectHomeNodes(self.nodes)
-        self.pacman = Pacman(self.nodes.getNodeFromTiles(*self.mazedata.obj.pacmanStart))
         self.pellets = PelletGroup(self.mazedata.obj.name+".txt")
+        # Initialize pacman with pelletgroup
+        self.pacman = Pacman(self.nodes.getNodeFromTiles(*self.mazedata.obj.pacmanStart), ghosts=None, pelletGroup=self.pellets)
         self.ghosts = GhostGroup(self.nodes.getStartTempNode(), self.pacman)
 
         self.ghosts.pinky.setStartNode(self.nodes.getNodeFromTiles(*self.mazedata.obj.addOffset(2, 3)))
@@ -62,6 +63,11 @@ class GameController(object):
         self.ghosts.clyde.setStartNode(self.nodes.getNodeFromTiles(*self.mazedata.obj.addOffset(4, 3)))
         self.ghosts.setSpawnNode(self.nodes.getNodeFromTiles(*self.mazedata.obj.addOffset(2, 3)))
         self.ghosts.blinky.setStartNode(self.nodes.getNodeFromTiles(*self.mazedata.obj.addOffset(2, 0)))
+
+        # Update pacman with a reference to the ghostgroup
+        self.pacman.setGhosts(self.ghosts.ghosts)
+        # Setup the behavior tree for pacman
+        self.pacman.setUpBehaviorTree()
 
         self.nodes.denyHomeAccess(self.pacman)
         self.nodes.denyHomeAccessList(self.ghosts)
